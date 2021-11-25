@@ -1,0 +1,64 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Nov  8 12:26:14 2021
+
+@author: SolovjevAV
+"""
+import numpy as np, matplotlib.pyplot as plt
+#from mpl_toolkits.mplot3d import axes3d
+def n_to_v(n,d): #Расчет скорости , где n - об/мин, d - диаметр.
+    v = np.pi*d*n/1000
+    return v
+
+#Параметры притира
+D = 380
+alfa1 = 30
+alfa2 = 30
+z = 6 #Глубина канавки, мм
+d = 10  # диаметр шарика, мм
+n = 100  #Частота вращения притира, об/мин.
+r = d/2
+nz = 600
+k = round(2*nz*2*np.pi, 0)
+
+# Расчет канавки
+
+alfa1, alfa2 = np.deg2rad(alfa1), np.deg2rad(alfa2)
+H = round(z * np.tan(alfa1) + z * np.tan(alfa2), 5) # Ширина канавки
+d1 = round(r * np.cos(alfa1), 5) * 2 + D #Максимальный диаметр контакта шарика с притиром в канавке
+d2 = D - round(r * np.cos(alfa2), 5) * 2  #Минимальный диаметр контакта шарика с притиром в канавке
+z1 = round(r * np.cos(alfa1),5)
+z2 = round(r * np.cos(alfa2),5)
+
+#fi1 = np.sin(n_to_v(n, d1)/n_to_v(n, d2)-1)
+
+#fi1 = 0.009
+
+Q = np.linspace(0, nz*2*np.pi, k)
+K = np.linspace(np.deg2rad(45), np.deg2rad(90), 46)
+
+
+for fi1 in K:
+    x, y, z = [], [], []
+    for q in Q:
+        fi = q*np.sin(fi1)
+        x.append(r*np.sin(q) * np.cos(fi))
+        y.append(r * np.sin(q) * np.sin(fi))
+        z.append(r * np.cos(q))
+        
+#    fig = plt.figure()
+#    ax = fig.add_subplot(111, projection = '3d')
+#    fig.title = fi1
+#    ax.plot(x, z, label='parametric curve', linewidth=0.2)
+    fig, ([ax1, ax2, ax3], [ax4, ax5, ax6]) = plt.subplots(2,3, figsize=(5,4))
+    ax1.plot(x, y, ls='-', lw=0.02)
+    ax2.plot(x, z, ls='-', lw=0.02)
+    ax3.plot(y,z, ls='-', lw=0.02)
+    ax4.scatter(x, y, s=0.01, marker='1')
+    ax5.scatter(x, z, s=0.01, marker='1')
+    ax6.scatter(y,z, s=0.01, marker='1')
+    
+    ax1.set_title(str(round(np.rad2deg(fi1),1)) + '  XY')
+    ax2.set_title('XZ')
+    ax3.set_title('YZ')
+    fig.savefig('e:\\' + str(round(np.rad2deg(fi1),1))+'_'+str(k)+'_'+str(nz)+'.jpg', dpi=400, figsize=(20,20))
